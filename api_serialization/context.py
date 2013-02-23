@@ -40,15 +40,20 @@ class WriteContext(object):
 
     def write(self, obj):
         if hasattr(obj, "serialization_adapter"):
-            with self.object():
-                for field in self.fields[self.path]:
-                    self.writer.write_key(field)
-                    converter = obj.serialization_adapter.converters[field]
-                    if obj in self.graph and field in self.graph[obj]:
-                        model, key = self.graph[obj][field]
-                        converter(obj, self, self.preloaded[model][key])
-                    else:
-                        converter(obj, self)
+            orig_path = self.path
+            try:
+                with self.object():
+                    for field in self.fields[self.path]:
+                        self.path = orig_path + field
+                        self.writer.write_key(field)
+                        converter = obj.serialization_adapter.converters[field]
+                        if obj in self.graph and field in self.graph[obj]:
+                            model, key = self.graph[obj][field]
+                            converter(obj, self, self.preloaded[model][key])
+                        else:
+                            converter(obj, self)
+            finally:
+                self.path = orig_path
         else:
             self.writer.write(obj)
 
