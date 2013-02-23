@@ -1,2 +1,3 @@
 from api_serialization.adapter import SerializationAdapter
 from api_serialization.context import SerializationContext
+from api_serialization.manager import StrategyManager
