@@ -1,5 +1,7 @@
 from api_serialization import SerializationAdapter, SerializationContext, StrategyManager
 
+from .utils import FakeStrategy
+
 
 class Album(object):
     serialization_adapter = SerializationAdapter(base_fields=["name"])
@@ -44,7 +46,7 @@ class TestConversion(object):
 
     def test_nested_field(self):
         manager = StrategyManager()
-        manager.register(type, lambda keys: dict((k, k) for k in keys))
+        manager.register(type, FakeStrategy())
         ctx = SerializationContext(fields=["artist.play_count"], strategy_manager=manager)
         album = Album(Artist())
         assert ctx.write(album) == '{"artist":{"play_count":1000}}'

@@ -1,5 +1,7 @@
 from api_serialization import SerializationAdapter, SerializationContext, StrategyManager
 
+from .utils import FakeStrategy
+
 
 class Artist(object):
     serialization_adapter = SerializationAdapter(base_fields=["name"])
@@ -32,7 +34,7 @@ class Album(object):
 class TestLoader(object):
     def test_simple_load(self):
         manager = StrategyManager()
-        manager.register(type, lambda keys: dict((k, k) for k in keys))
+        manager.register(type, FakeStrategy())
         ctx = SerializationContext(strategy_manager=manager)
         album = Album(artist=Artist("ABBA"))
         assert ctx.write(album) == '{"artist":{"name":"ABBA"}}'

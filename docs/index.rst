@@ -1,22 +1,11 @@
-.. API Serialization documentation master file, created by
-   sphinx-quickstart on Sat Feb 23 10:09:31 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Welcome to API Serialization!
+=============================
 
-Welcome to API Serialization's documentation!
-=============================================
-
-Contents:
+``api_serialization`` is a Python toolkit for serializing objects, for use in
+APIs. It handles details for you like optional fields, as well as efficiently
+preloading the entire object graph.
 
 .. toctree::
    :maxdepth: 2
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   getting-started

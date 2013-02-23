@@ -53,7 +53,7 @@ class LoadContext(object):
                 keys.add(key)
 
             strategy = self.strategy_manager.strategies[type(cls)]
-            keys_to_objects = strategy(keys)
+            keys_to_objects = strategy.load(keys)
             if cls not in self.preloaded:
                 self.preloaded[cls] = {}
             for key, obj in keys_to_objects.iteritems():
