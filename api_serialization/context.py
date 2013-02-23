@@ -23,7 +23,7 @@ class LoadContext(object):
         self.fields = fields
 
     def trace(self, obj):
-        return {}, {}, {obj.serialization_adapter: self.fields}
+        return {}, {}, {"": self.fields}
 
 
 class WriteContext(object):
@@ -33,6 +33,7 @@ class WriteContext(object):
         self.graph = graph
         self.preloaded = preloaded
         self.writer = JSONWriter()
+        self.path = ""
 
     def object(self):
         return self.writer.object()
@@ -40,7 +41,7 @@ class WriteContext(object):
     def write(self, obj):
         if hasattr(obj, "serialization_adapter"):
             with self.object():
-                for field in self.fields[obj.serialization_adapter]:
+                for field in self.fields[self.path]:
                     self.writer.write_key(field)
                     obj.serialization_adapter.converters[field](obj, self)
         else:
