@@ -70,8 +70,10 @@ class LoadContext(object):
             for field in self.raw_fields:
                 if field.startswith(path):
                     partial_path = field[len(path):]
-                    if "." in path:
-                        raise NotImplementedError()
+                    if partial_path[0] == ".":
+                        partial_path = partial_path[1:]
+                    if "." in partial_path:
+                        fields.append(partial_path[:partial_path.index(".")])
                     else:
                         fields.append(partial_path)
 
@@ -79,7 +81,7 @@ class LoadContext(object):
         for field in fields:
             if field in cls.serialization_adapter.loaders:
                 self.current_field = field
-                self.current_path = path + "." + field
+                self.current_path = (path + "." if path else path) + field
                 for instance in instances:
                     self.current_object = instance
                     cls.serialization_adapter.loaders[field](instance, self)
@@ -103,7 +105,7 @@ class WriteContext(object):
             try:
                 with self.object():
                     for field in self.fields[self.path]:
-                        self.path = orig_path + "." + field
+                        self.path = (orig_path + "." if orig_path else orig_path) + field
                         self.writer.write_key(field)
                         converter = obj.serialization_adapter.converters[field]
                         if obj in self.graph and field in self.graph[obj]:
