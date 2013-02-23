@@ -8,7 +8,7 @@ class SerializationContext(object):
 
     def write(self, obj):
         load_ctx = LoadContext(fields=self.fields)
-        # {object: {field: key}
+        # {object: {field: (model, key)}
         # {model: {key: object}}
         # {serialization_adapter: fields}
         graph, preloaded, fields = load_ctx.trace(obj)
@@ -43,7 +43,12 @@ class WriteContext(object):
             with self.object():
                 for field in self.fields[self.path]:
                     self.writer.write_key(field)
-                    obj.serialization_adapter.converters[field](obj, self)
+                    converter = obj.serialization_adapter.converters[field]
+                    if obj in self.graph and field in self.graph[obj]:
+                        model, key = self.graph[obj][field]
+                        converter(obj, self, self.preloaded[model][key])
+                    else:
+                        converter(obj, self)
         else:
             self.writer.write(obj)
 
