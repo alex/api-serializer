@@ -2,12 +2,12 @@ from json_writer import JSONWriter
 
 
 class SerializationContext(object):
-    def __init__(self, fields):
+    def __init__(self, fields=None):
         super(SerializationContext, self).__init__()
         self.fields = fields
 
     def write(self, obj):
-        load_ctx = LoadContext(fields=self.fields)
+        load_ctx = LoadContext(raw_fields=self.fields)
         # {object: {field: (model, key)}
         # {model: {key: object}}
         # {serialization_adapter: fields}
@@ -18,12 +18,17 @@ class SerializationContext(object):
 
 
 class LoadContext(object):
-    def __init__(self, fields):
+    def __init__(self, raw_fields):
         super(LoadContext, self).__init__()
-        self.fields = fields
+        self.raw_fields = raw_fields
 
     def trace(self, obj):
-        return {}, {}, {"": self.fields}
+        fields = {}
+        if self.raw_fields is None:
+            fields[""] = obj.serialization_adapter.base_fields
+        else:
+            fields[""] = self.raw_fields
+        return {}, {}, fields
 
 
 class WriteContext(object):
