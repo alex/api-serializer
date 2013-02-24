@@ -15,7 +15,7 @@ class SerializationContext(object):
         load_ctx = LoadContext(fields=compiled_fields, strategy_manager=self.strategy_manager)
         graph, preloaded = load_ctx.trace(obj)
         write_ctx = WriteContext(compiled_fields, graph, preloaded)
-        write_ctx.write(obj)
+        write_ctx.write(obj, root=True)
         return write_ctx.build()
 
 
@@ -69,10 +69,8 @@ class LoadContext(object):
             self.graph[self.current_object] = {}
         self.graph[self.current_object][self.current_field] = (cls, key)
 
-        if cls not in self.needs_load:
-            self.needs_load[cls] = set()
         if cls not in self.preloaded or key not in self.preloaded[key]:
-            self.needs_load[cls].add(key)
+            self.needs_load.setdefault(cls, set()).add(key)
 
     def trace(self, obj):
         self._trace(type(obj), [obj], root=True)
@@ -106,7 +104,6 @@ class WriteContext(object):
         self.graph = graph
         self.preloaded = preloaded
         self.writer = JSONWriter()
-        self.root = True
 
     def object(self):
         return self.writer.object()
@@ -114,9 +111,7 @@ class WriteContext(object):
     def array(self):
         return self.writer.array()
 
-    def write(self, obj):
-        root = self.root
-        self.root = False
+    def write(self, obj, root=False):
         if hasattr(obj, "serialization_adapter"):
             with self.object():
                 fields = self.fields.get_fields_for_class(type(obj), root=root)
