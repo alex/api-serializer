@@ -80,10 +80,10 @@ class LoadContext(object):
             cls, keys = self.needs_load.popitem()
             strategy = self.strategy_manager.strategies[type(cls)]
             keys_to_objects = strategy.load(keys)
-            if cls not in self.preloaded:
-                self.preloaded[cls] = {}
+
+            preloaded = self.preloaded.setdefault(cls, {})
             for key, obj in keys_to_objects.iteritems():
-                self.preloaded[cls][key] = obj
+                preloaded[key] = obj
             self._trace(cls, keys_to_objects.itervalues())
         return self.graph, self.preloaded
 
@@ -92,10 +92,11 @@ class LoadContext(object):
 
         for field in fields:
             if field in cls.serialization_adapter.loaders:
+                loader = cls.serialization_adapter.loaders[field]
                 self.current_field = field
                 for instance in instances:
                     self.current_object = instance
-                    cls.serialization_adapter.loaders[field](instance, self)
+                    loader(instance, self)
 
 
 class WriteContext(object):
