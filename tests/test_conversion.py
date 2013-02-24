@@ -30,6 +30,13 @@ class Artist(object):
     def convert_play_count(self, ctx):
         ctx.write(1000)
 
+    @serialization_adapter.converter("numbers")
+    def convert_numbers(self, ctx):
+        with ctx.array():
+            ctx.write(1)
+            ctx.write(2)
+            ctx.write(3)
+
 
 class TestConversion(object):
     def test_simple_convert(self):
@@ -46,3 +53,7 @@ class TestConversion(object):
         ctx = SerializationContext(fields=["Artist.play_count"], strategy_manager=manager)
         album = Album(Artist())
         assert ctx.write(album) == '{"artist":{"play_count":1000}}'
+
+    def test_array(self):
+        ctx = SerializationContext(fields=["numbers"])
+        assert ctx.write(Artist()) == '{"numbers":[1,2,3]}'

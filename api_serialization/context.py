@@ -111,6 +111,9 @@ class WriteContext(object):
     def object(self):
         return self.writer.object()
 
+    def array(self):
+        return self.writer.array()
+
     def write(self, obj):
         root = self.root
         self.root = False
