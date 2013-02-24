@@ -4,7 +4,7 @@ from .utils import FakeStrategy
 
 
 class Album(object):
-    serialization_adapter = SerializationAdapter(base_fields=["name"])
+    serialization_adapter = SerializationAdapter(base_fields=["artist"])
 
     def __init__(self, artist):
         super(Album, self).__init__()
@@ -36,10 +36,6 @@ class TestConversion(object):
         ctx = SerializationContext(fields=["name"])
         assert ctx.write(Artist()) == '{"name":"ABBA"}'
 
-    def test_no_fields(self):
-        ctx = SerializationContext(fields=[])
-        assert ctx.write(Artist()) == "{}"
-
     def test_base_fields(self):
         ctx = SerializationContext()
         assert ctx.write(Artist()) == '{"name":"ABBA"}'
@@ -47,6 +43,6 @@ class TestConversion(object):
     def test_nested_field(self):
         manager = StrategyManager()
         manager.register(type, FakeStrategy())
-        ctx = SerializationContext(fields=["artist.play_count"], strategy_manager=manager)
+        ctx = SerializationContext(fields=["Artist.play_count"], strategy_manager=manager)
         album = Album(Artist())
         assert ctx.write(album) == '{"artist":{"play_count":1000}}'

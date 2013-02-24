@@ -2,6 +2,7 @@ class SerializationAdapter(object):
     def __init__(self, base_fields=None):
         super(SerializationAdapter, self).__init__()
         self.base_fields = base_fields
+        self.name = None
         self.converters = {}
         self.loaders = {}
 
